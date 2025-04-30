@@ -37,6 +37,11 @@ public class Insert extends javax.swing.JDialog {
         DropPhotoListener d = new DropPhotoListener(photo, this);
         DropTarget dropTarget = new DropTarget(photo, d);
         insert.setEnabled(false);
+
+        if (dateOfBirth.getComponent(1) instanceof JButton button) {
+            button.setText("Select a date");
+            button.setPreferredSize(new java.awt.Dimension(120, 22));
+        }
     }
 
     public JButton getReset() {
@@ -215,6 +220,7 @@ public class Insert extends javax.swing.JDialog {
         nif.setMaximumSize(new java.awt.Dimension(400, 22));
         nif.setMinimumSize(new java.awt.Dimension(400, 22));
         nif.setPreferredSize(new java.awt.Dimension(400, 22));
+ 3-add-placeholder-text-to-input-fields
         nif.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 nifFocusGained(evt);
@@ -228,6 +234,7 @@ public class Insert extends javax.swing.JDialog {
                 nifActionPerformed(evt);
             }
         });
+ master
         nif.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 nifKeyPressed(evt);
@@ -374,6 +381,7 @@ public class Insert extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_nifKeyPressed
 
+ 3-add-placeholder-text-to-input-fields
     private void nifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nifActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_nifActionPerformed
@@ -416,6 +424,7 @@ public class Insert extends javax.swing.JDialog {
         this.requestFocusInWindow();
     }//GEN-LAST:event_formWindowGainedFocus
 
+ master
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdatepicker.JDatePicker dateOfBirth;
     private javax.swing.JButton insert;
