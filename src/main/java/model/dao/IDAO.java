@@ -63,4 +63,13 @@ public interface IDAO {
      * @throws java.lang.Exception
      */
     public abstract void deleteAll () throws Exception;
+    
+    /**
+    * This function returns the total number of people registered in the 
+    * application. If there is any access problem or failure, it generates an 
+    * Exception that has to be managed by the controller.
+    * @return total number of registered persons
+    * @throws java.lang.Exception
+    */
+    public abstract int count() throws Exception;
 }
