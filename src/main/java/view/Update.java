@@ -38,7 +38,11 @@ public class Update extends javax.swing.JDialog {
         DropTarget dropTarget = new DropTarget(photo, d);
         read.setVisible(false);
         update.setEnabled(false);
-
+        update.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JOptionPane.showMessageDialog(Update.this, "Person updated successfully!", "Update", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
         if (dateOfBirth.getComponent(1) instanceof JButton button) {
             button.setText("Select a date");
             button.setPreferredSize(new java.awt.Dimension(120, 22));
@@ -343,7 +347,7 @@ public class Update extends javax.swing.JDialog {
         dateOfBirth.getModel().setValue(null);
         dateOfBirth.setEnabled(false);
         update.setEnabled(false);
-        
+
         addPlaceholderStyle(nif);
         addPlaceholderStyle(name);
     }//GEN-LAST:event_resetActionPerformed

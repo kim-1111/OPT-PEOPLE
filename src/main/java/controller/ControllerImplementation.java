@@ -377,8 +377,10 @@ public class ControllerImplementation implements IController, ActionListener {
 
         if (answer == 0) {
             deleteAll();
+            JOptionPane.showMessageDialog(menu, "All persons have been deleted successfully!", "Delete All - People v1.1.0", JOptionPane.WARNING_MESSAGE);
         }
     }
+
 
     public void handleCount() {
         count = new Count(menu, true);
@@ -386,6 +388,7 @@ public class ControllerImplementation implements IController, ActionListener {
         count.getCount().setText(String.valueOf(totalPeople)); // Set count in JTextField
         count.setVisible(true);
     }
+
 
     /**
      * This function inserts the Person object with the requested NIF, if it
