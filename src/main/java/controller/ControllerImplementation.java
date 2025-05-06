@@ -236,6 +236,7 @@ public class ControllerImplementation implements IController, ActionListener {
         }
         insert(p);
         insert.getReset().doClick();
+        
     }
 
     private void handleReadAction() {
