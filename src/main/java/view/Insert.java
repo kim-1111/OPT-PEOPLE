@@ -37,11 +37,16 @@ public class Insert extends javax.swing.JDialog {
         DropPhotoListener d = new DropPhotoListener(photo, this);
         DropTarget dropTarget = new DropTarget(photo, d);
         insert.setEnabled(false);
-
+        insert.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JOptionPane.showMessageDialog(Insert.this, "Person inserted successfully!", "Insert", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
         if (dateOfBirth.getComponent(1) instanceof JButton button) {
             button.setText("Select a date");
             button.setPreferredSize(new java.awt.Dimension(120, 22));
         }
+
     }
 
     public JButton getReset() {
