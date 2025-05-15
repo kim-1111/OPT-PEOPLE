@@ -455,7 +455,13 @@ public class ControllerImplementation implements IController, ActionListener {
     public void delete(Person p) {
         try {
             if (dao.read(p) != null) {
-                dao.delete(p);
+                int respuesta = JOptionPane.showConfirmDialog(null,"¿Deseas continuar?","Confirmación",JOptionPane.YES_NO_OPTION ); 
+               if (respuesta == JOptionPane.YES_OPTION) {
+                   dao.delete(p);
+                   JOptionPane.showMessageDialog(null, "Succesfully Deleted");
+        } else if (respuesta == JOptionPane.NO_OPTION) {
+                   JOptionPane.showMessageDialog(null, "Not Deleted");
+        }
             } else {
                 throw new PersonException(p.getNif() + " is not registered and can not "
                         + "be DELETED");
