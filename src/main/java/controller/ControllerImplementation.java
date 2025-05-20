@@ -18,7 +18,6 @@ import view.Read;
 import view.ReadAll;
 import view.Update;
 import view.Count;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -26,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
@@ -47,6 +48,8 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import view.Login;
+
 
 /**
  * This class starts the visual part of the application and programs and manages
@@ -69,6 +72,7 @@ public class ControllerImplementation implements IController, ActionListener {
     private Update update;
     private ReadAll readAll;
     private Count count;
+    private Login login;
 
     /**
      * This constructor allows the controller to know which data storage option
@@ -101,6 +105,8 @@ public class ControllerImplementation implements IController, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == dSS.getAccept()[0]) {
             handleDataStorageSelection();
+        } else if (e.getSource() == login.getLogin()) {
+            handleLoginAction();
         } else if (e.getSource() == menu.getInsert()) {
             handleInsertAction();
         } else if (insert != null && e.getSource() == insert.getInsert()) {
@@ -220,7 +226,7 @@ public class ControllerImplementation implements IController, ActionListener {
                 setupJPADatabase();
                 break;
         }
-        setupMenu();
+        handleLogin();
     }
 
     private void setupFileStorage() {
@@ -460,7 +466,6 @@ public class ControllerImplementation implements IController, ActionListener {
         }
     }
 
-
     public void handleCount() {
         count = new Count(menu, true);
         int totalPeople = count(); // Get the total number of people
@@ -468,6 +473,42 @@ public class ControllerImplementation implements IController, ActionListener {
         count.setVisible(true);
     }
 
+    public void handleLogin() {
+        login = new Login(menu, true);
+        login.getLogin().addActionListener(this);
+        login.setVisible(true);
+    }
+
+    private void handleLoginAction() {
+        if (loginSuccessfully()) {
+            login.dispose();
+            setupMenu();
+        } else {
+            JOptionPane.showMessageDialog(login, "Invalid username or password.", "Login - People v1.1.0", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
+
+    private boolean loginSuccessfully() {
+        String username = login.getUserName().getText();
+        // Get password as char[] from JPasswordField and convert to String
+        char[] passwordChars = login.getPassword().getPassword();
+        String password = new String(passwordChars);
+        try {
+            // Connect to the database with the user's credentials
+            Connection conn = DriverManager.getConnection(
+                    Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
+                    username,
+                    password
+            );
+            conn.close();
+            java.util.Arrays.fill(passwordChars, ' ');
+            return true;
+        } catch (SQLException ex) {
+            java.util.Arrays.fill(passwordChars, ' ');
+            return false;
+        }
+    }
 
     /**
      * This function inserts the Person object with the requested NIF, if it
