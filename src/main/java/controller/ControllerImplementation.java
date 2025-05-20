@@ -18,7 +18,6 @@ import view.Read;
 import view.ReadAll;
 import view.Update;
 import view.Count;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -41,7 +40,16 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.jdatepicker.DateModel;
 import utils.Constants;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import view.Login;
+
 
 /**
  * This class starts the visual part of the application and programs and manages
@@ -125,7 +133,76 @@ public class ControllerImplementation implements IController, ActionListener {
             handleCount();
         }
     }
+    
+    public void exportDataToCSV() {
+    try {
+        ArrayList<Person> allPeople = dao.readAll();
+        if (allPeople != null && !allPeople.isEmpty()) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Save as CSV");
+            
+            // Sugerir un nombre de archivo por defecto
+            LocalDate now = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            String defaultFileName = "people_data_" + now.format(formatter) + ".csv";
+            fileChooser.setSelectedFile(new File(defaultFileName));
 
+            int userSelection = fileChooser.showSaveDialog(readAll);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                String filePath = fileToSave.getAbsolutePath();
+                
+                // Asegurar extensión .csv
+                if (!filePath.toLowerCase().endsWith(".csv")) {
+                    filePath += ".csv";
+                    fileToSave = new File(filePath);
+                }
+
+                try (PrintWriter writer = new PrintWriter(new FileWriter(fileToSave))) {
+                    // Escribir encabezados
+                    writer.println("NIF,Name,Date of Birth,Photo");
+                    
+                    // Escribir datos
+                    for (Person person : allPeople) {
+                        String dob = person.getDateOfBirth() != null ? 
+                            person.getDateOfBirth().toString() : "";
+                        String photo = person.getPhoto() != null ? "yes" : "no";
+                        
+                        // Escapar comas en los datos
+                        String name = person.getName().contains(",") ? 
+                            "\"" + person.getName() + "\"" : person.getName();
+                        
+                        writer.println(String.join(",",
+                            person.getNif(),
+                            name,
+                            dob,
+                            photo
+                        ));
+                    }
+                    
+                    JOptionPane.showMessageDialog(readAll, 
+                        "Data successfully exported to:\n" + fileToSave.getAbsolutePath(), 
+                        "Export Successful", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(readAll, 
+                        "Error exporting to CSV:\n" + ex.getMessage(), 
+                        "Export Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(readAll, 
+                "No data available to export.", 
+                "Export", JOptionPane.INFORMATION_MESSAGE);
+        }
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(readAll, 
+            "Error getting data for export:\n" + ex.getMessage(), 
+            "Export Error", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
+    }
+}
+    
     private void handleDataStorageSelection() {
         String daoSelected = ((javax.swing.JCheckBox) (dSS.getAccept()[1])).getText();
         dSS.dispose();
@@ -342,31 +419,33 @@ public class ControllerImplementation implements IController, ActionListener {
     }
 
     public void handleReadAll() {
-        ArrayList<Person> s = readAll();
-        if (s.isEmpty()) {
-            JOptionPane.showMessageDialog(menu, "There are not people registered yet.", "Read All - People v1.1.0", JOptionPane.WARNING_MESSAGE);
-        } else {
-            readAll = new ReadAll(menu, true);
-            DefaultTableModel model = (DefaultTableModel) readAll.getTable().getModel();
-            for (int i = 0; i < s.size(); i++) {
-                model.addRow(new Object[i]);
-                model.setValueAt(s.get(i).getNif(), i, 0);
-                model.setValueAt(s.get(i).getName(), i, 1);
-                if (s.get(i).getDateOfBirth() != null) {
-                    model.setValueAt(s.get(i).getDateOfBirth().toString(), i, 2);
-                } else {
-                    model.setValueAt("", i, 2);
-                }
-                if (s.get(i).getPhoto() != null) {
-                    model.setValueAt("yes", i, 3);
-                } else {
-                    model.setValueAt("no", i, 3);
-                }
-            }
-            readAll.setVisible(true);
+    ArrayList<Person> s = readAll();
+    if (s.isEmpty()) {
+        JOptionPane.showMessageDialog(menu, "There are not people registered yet.", 
+            "Read All - People v1.1.0", JOptionPane.WARNING_MESSAGE);
+    } else {
+        readAll = new ReadAll(menu, true);
+        DefaultTableModel model = (DefaultTableModel) readAll.getTable().getModel();
+        
+        // Limpiar el modelo si ya tiene datos
+        model.setRowCount(0);
+        
+        for (Person person : s) {
+            Object[] rowData = new Object[]{
+                person.getNif(),
+                person.getName(),
+                person.getDateOfBirth() != null ? person.getDateOfBirth().toString() : "",
+                person.getPhoto() != null ? "yes" : "no"
+            };
+            model.addRow(rowData);
         }
+        
+        // Conectar el botón de exportación
+        readAll.getExportButton().addActionListener(e -> exportDataToCSV());
+        
+        readAll.setVisible(true);
     }
-
+}
     public void handleDeleteAll() {
         Object[] options = {"Yes", "No"};
         //int answer = JOptionPane.showConfirmDialog(menu, "Are you sure to delete all people registered?", "Delete All - People v1.1.0", 0, 0);
