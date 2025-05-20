@@ -73,6 +73,7 @@ public class ControllerImplementation implements IController, ActionListener {
     private ReadAll readAll;
     private Count count;
     private Login login;
+    private String userRole;
 
     /**
      * This constructor allows the controller to know which data storage option
@@ -261,28 +262,51 @@ public class ControllerImplementation implements IController, ActionListener {
         dao = new DAOFileSerializable();
     }
 
-    private void setupSQLDatabase() {
-        try {
-            Connection conn = DriverManager.getConnection(Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
-                    Routes.DB.getDbServerUser(), Routes.DB.getDbServerPassword());
-            if (conn != null) {
-                Statement stmt = conn.createStatement();
-                stmt.executeUpdate("create database if not exists " + Routes.DB.getDbServerDB() + ";");
-                stmt.executeUpdate("create table if not exists " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + "("
-                        + "nif varchar(9) primary key not null, "
-                        + "name varchar(50), "
-                        + "dateOfBirth DATE, "
-                        + "email varchar(100),"
-                        + "photo varchar(200) );");
-                stmt.close();
-                conn.close();
+private void setupSQLDatabase() {
+    try {
+        Connection conn = DriverManager.getConnection(
+            Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
+            Routes.DB.getDbServerUser(), 
+            Routes.DB.getDbServerPassword());
+        
+        if (conn != null) {
+            Statement stmt = conn.createStatement();
+            
+            // Crear base de datos si no existe
+            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ";");
+            
+            // Crear tabla para personas (tu tabla existente)
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + "("
+                + "nif VARCHAR(9) PRIMARY KEY NOT NULL, "
+                + "name VARCHAR(50), "
+                + "dateOfBirth DATE, "
+                + "photo VARCHAR(200));");
+            
+            // Crear tabla para usuarios y roles
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ".users ("
+                + "username VARCHAR(50) PRIMARY KEY, "
+                + "password VARCHAR(100) NOT NULL, "
+                + "user_role VARCHAR(20) NOT NULL DEFAULT 'employee');");
+            
+            // Insertar usuario admin por defecto (password debería ser hasheado en producción)
+            try {
+                stmt.executeUpdate("INSERT INTO " + Routes.DB.getDbServerDB() + ".users VALUES "
+                    + "('admin', 'admin123', 'admin'), "
+                    + "('employee1', 'emp123', 'employee');");
+            } catch (SQLException e) {
+                System.out.println("Admin user already exists or error inserting: " + e.getMessage());
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(dSS, "SQL-DDBB structure not created. Closing application.", "SQL_DDBB - People v1.1.0", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+            
+            stmt.close();
+            conn.close();
         }
-        dao = new DAOSQL();
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(dSS, "SQL-DDBB structure not created. Closing application.", 
+            "SQL_DDBB - People v1.1.0", JOptionPane.ERROR_MESSAGE);
+        System.exit(0);
     }
+    dao = new DAOSQL();
+}
 
     private void setupJPADatabase() {
         try {
@@ -494,35 +518,56 @@ public class ControllerImplementation implements IController, ActionListener {
     }
 
     private void handleLoginAction() {
-        if (loginSuccessfully()) {
-            login.dispose();
-            setupMenu();
-        } else {
-            JOptionPane.showMessageDialog(login, "Invalid username or password.", "Login - People v1.1.0", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+    if (loginSuccessfully()) {
+        login.dispose();
+        setupMenu(); // Call setupMenu after successful login
+        applyRolePermissions(); // New method to apply permissions based on role
+    } else {
+        JOptionPane.showMessageDialog(login, "Invalid username or password.", "Login - People v1.1.0", JOptionPane.ERROR_MESSAGE);
+        return;
     }
+}
 
-    private boolean loginSuccessfully() {
-        String username = login.getUserName().getText();
-        // Get password as char[] from JPasswordField and convert to String
-        char[] passwordChars = login.getPassword().getPassword();
-        String password = new String(passwordChars);
-        try {
-            // Connect to the database with the user's credentials
-            Connection conn = DriverManager.getConnection(
-                    Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
-                    username,
-                    password
-            );
+private boolean loginSuccessfully() {
+    String username = login.getUserName().getText();
+    char[] passwordChars = login.getPassword().getPassword();
+    String password = new String(passwordChars);
+
+    try {
+        Connection conn = DriverManager.getConnection(
+            Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
+            Routes.DB.getDbServerUser(),
+            Routes.DB.getDbServerPassword());
+
+        PreparedStatement stmt = conn.prepareStatement(
+            "SELECT user_role FROM " + Routes.DB.getDbServerDB() + ".users " +
+            "WHERE username = ? AND password = ?");
+
+        stmt.setString(1, username);
+        stmt.setString(2, password); // In a real application, hash the password
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            this.userRole = rs.getString("user_role"); // Store the user role
+            rs.close();
+            stmt.close();
             conn.close();
-            java.util.Arrays.fill(passwordChars, ' ');
+            java.util.Arrays.fill(passwordChars, ' '); // Clear password in memory
             return true;
-        } catch (SQLException ex) {
-            java.util.Arrays.fill(passwordChars, ' ');
-            return false;
         }
+
+        rs.close();
+        stmt.close();
+        conn.close();
+        java.util.Arrays.fill(passwordChars, ' ');
+        return false;
+    } catch (SQLException ex) {
+        java.util.Arrays.fill(passwordChars, ' ');
+        JOptionPane.showMessageDialog(login, "Error de conexión: " + ex.getMessage(),
+            "Error", JOptionPane.ERROR_MESSAGE);
+        return false;
     }
+}
 
     /**
      * This function inserts the Person object with the requested NIF, if it
@@ -706,5 +751,29 @@ public class ControllerImplementation implements IController, ActionListener {
         }
         return count;
     }
-
+private void applyRolePermissions() {
+    if (userRole != null) {
+        if ("employee".equalsIgnoreCase(userRole)) {
+            // Disable actions for employee
+            menu.getInsert().setEnabled(false);
+            menu.getUpdate().setEnabled(false);
+            menu.getDelete().setEnabled(false);
+            menu.getDeleteAll().setEnabled(false);
+            menu.getInsert().setVisible(false);
+            menu.getUpdate().setVisible(false);
+            menu.getDelete().setVisible(false);
+            menu.getDeleteAll().setVisible(false);
+        } else if ("admin".equalsIgnoreCase(userRole)) {
+            // Ensure all actions are enabled for admin (default behavior, but good to be explicit)
+            menu.getInsert().setEnabled(true);
+            menu.getUpdate().setEnabled(true);
+            menu.getDelete().setEnabled(true);
+            menu.getDeleteAll().setEnabled(true);
+            menu.getInsert().setVisible(true);
+            menu.getUpdate().setVisible(true);
+            menu.getDelete().setVisible(true);
+            menu.getDeleteAll().setVisible(true);
+        }
+    }
+}
 }
