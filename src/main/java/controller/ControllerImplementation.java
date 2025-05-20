@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import model.dao.DAOJPA;
 import view.Login;
 
-
 /**
  * This class starts the visual part of the application and programs and manages
  * all the events that it can receive from it. For each event received the
@@ -134,76 +133,76 @@ public class ControllerImplementation implements IController, ActionListener {
             handleCount();
         }
     }
-    
+
     public void exportDataToCSV() {
-    try {
-        ArrayList<Person> allPeople = dao.readAll();
-        if (allPeople != null && !allPeople.isEmpty()) {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Save as CSV");
-            
-            // Sugerir un nombre de archivo por defecto
-            LocalDate now = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            String defaultFileName = "people_data_" + now.format(formatter) + ".csv";
-            fileChooser.setSelectedFile(new File(defaultFileName));
+        try {
+            ArrayList<Person> allPeople = dao.readAll();
+            if (allPeople != null && !allPeople.isEmpty()) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Save as CSV");
 
-            int userSelection = fileChooser.showSaveDialog(readAll);
+                // Sugerir un nombre de archivo por defecto
+                LocalDate now = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                String defaultFileName = "people_data_" + now.format(formatter) + ".csv";
+                fileChooser.setSelectedFile(new File(defaultFileName));
 
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
-                File fileToSave = fileChooser.getSelectedFile();
-                String filePath = fileToSave.getAbsolutePath();
-                
-                // Asegurar extensión .csv
-                if (!filePath.toLowerCase().endsWith(".csv")) {
-                    filePath += ".csv";
-                    fileToSave = new File(filePath);
-                }
+                int userSelection = fileChooser.showSaveDialog(readAll);
 
-                try (PrintWriter writer = new PrintWriter(new FileWriter(fileToSave))) {
-                    // Escribir encabezados
-                    writer.println("NIF,Name,Date of Birth,Photo");
-                    
-                    // Escribir datos
-                    for (Person person : allPeople) {
-                        String dob = person.getDateOfBirth() != null ? 
-                            person.getDateOfBirth().toString() : "";
-                        String photo = person.getPhoto() != null ? "yes" : "no";
-                        
-                        // Escapar comas en los datos
-                        String name = person.getName().contains(",") ? 
-                            "\"" + person.getName() + "\"" : person.getName();
-                        
-                        writer.println(String.join(",",
-                            person.getNif(),
-                            name,
-                            dob,
-                            photo
-                        ));
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = fileChooser.getSelectedFile();
+                    String filePath = fileToSave.getAbsolutePath();
+
+                    // Asegurar extensión .csv
+                    if (!filePath.toLowerCase().endsWith(".csv")) {
+                        filePath += ".csv";
+                        fileToSave = new File(filePath);
                     }
-                    
-                    JOptionPane.showMessageDialog(readAll, 
-                        "Data successfully exported to:\n" + fileToSave.getAbsolutePath(), 
-                        "Export Successful", JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(readAll, 
-                        "Error exporting to CSV:\n" + ex.getMessage(), 
-                        "Export Error", JOptionPane.ERROR_MESSAGE);
+
+                    try (PrintWriter writer = new PrintWriter(new FileWriter(fileToSave))) {
+                        // Escribir encabezados
+                        writer.println("NIF,Name,Date of Birth,Photo");
+
+                        // Escribir datos
+                        for (Person person : allPeople) {
+                            String dob = person.getDateOfBirth() != null
+                                    ? person.getDateOfBirth().toString() : "";
+                            String photo = person.getPhoto() != null ? "yes" : "no";
+
+                            // Escapar comas en los datos
+                            String name = person.getName().contains(",")
+                                    ? "\"" + person.getName() + "\"" : person.getName();
+
+                            writer.println(String.join(",",
+                                    person.getNif(),
+                                    name,
+                                    dob,
+                                    photo
+                            ));
+                        }
+
+                        JOptionPane.showMessageDialog(readAll,
+                                "Data successfully exported to:\n" + fileToSave.getAbsolutePath(),
+                                "Export Successful", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(readAll,
+                                "Error exporting to CSV:\n" + ex.getMessage(),
+                                "Export Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
+            } else {
+                JOptionPane.showMessageDialog(readAll,
+                        "No data available to export.",
+                        "Export", JOptionPane.INFORMATION_MESSAGE);
             }
-        } else {
-            JOptionPane.showMessageDialog(readAll, 
-                "No data available to export.", 
-                "Export", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(readAll,
+                    "Error getting data for export:\n" + ex.getMessage(),
+                    "Export Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
-    } catch (Exception ex) {
-        JOptionPane.showMessageDialog(readAll, 
-            "Error getting data for export:\n" + ex.getMessage(), 
-            "Export Error", JOptionPane.ERROR_MESSAGE);
-        ex.printStackTrace();
     }
-}
-    
+
     private void handleDataStorageSelection() {
         String daoSelected = ((javax.swing.JCheckBox) (dSS.getAccept()[1])).getText();
         dSS.dispose();
@@ -262,51 +261,51 @@ public class ControllerImplementation implements IController, ActionListener {
         dao = new DAOFileSerializable();
     }
 
-private void setupSQLDatabase() {
-    try {
-        Connection conn = DriverManager.getConnection(
-            Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
-            Routes.DB.getDbServerUser(), 
-            Routes.DB.getDbServerPassword());
-        
-        if (conn != null) {
-            Statement stmt = conn.createStatement();
-            
-            // Crear base de datos si no existe
-            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ";");
-            
-            // Crear tabla para personas (tu tabla existente)
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + "("
-                + "nif VARCHAR(9) PRIMARY KEY NOT NULL, "
-                + "name VARCHAR(50), "
-                + "dateOfBirth DATE, "
-                + "photo VARCHAR(200));");
-            
-            // Crear tabla para usuarios y roles
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ".users ("
-                + "username VARCHAR(50) PRIMARY KEY, "
-                + "password VARCHAR(100) NOT NULL, "
-                + "user_role VARCHAR(20) NOT NULL DEFAULT 'employee');");
-            
-            // Insertar usuario admin por defecto (password debería ser hasheado en producción)
-            try {
-                stmt.executeUpdate("INSERT INTO " + Routes.DB.getDbServerDB() + ".users VALUES "
-                    + "('admin', 'admin123', 'admin'), "
-                    + "('employee1', 'emp123', 'employee');");
-            } catch (SQLException e) {
-                System.out.println("Admin user already exists or error inserting: " + e.getMessage());
+    private void setupSQLDatabase() {
+        try {
+            Connection conn = DriverManager.getConnection(
+                    Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
+                    Routes.DB.getDbServerUser(),
+                    Routes.DB.getDbServerPassword());
+
+            if (conn != null) {
+                Statement stmt = conn.createStatement();
+
+                // Crear base de datos si no existe
+                stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ";");
+
+                // Crear tabla para personas (tu tabla existente)
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + "("
+                        + "nif VARCHAR(9) PRIMARY KEY NOT NULL, "
+                        + "name VARCHAR(50), "
+                        + "dateOfBirth DATE, "
+                        + "photo VARCHAR(200));");
+
+                // Crear tabla para usuarios y roles
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ".users ("
+                        + "username VARCHAR(50) PRIMARY KEY, "
+                        + "password VARCHAR(100) NOT NULL, "
+                        + "user_role VARCHAR(20) NOT NULL DEFAULT 'employee');");
+
+                // Insertar usuario admin por defecto (password debería ser hasheado en producción)
+                try {
+                    stmt.executeUpdate("INSERT INTO " + Routes.DB.getDbServerDB() + ".users VALUES "
+                            + "('admin', 'admin123', 'admin'), "
+                            + "('employee1', 'emp123', 'employee');");
+                } catch (SQLException e) {
+                    System.out.println("Admin user already exists or error inserting: " + e.getMessage());
+                }
+
+                stmt.close();
+                conn.close();
             }
-            
-            stmt.close();
-            conn.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(dSS, "SQL-DDBB structure not created. Closing application.",
+                    "SQL_DDBB - People v1.1.0", JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
         }
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(dSS, "SQL-DDBB structure not created. Closing application.", 
-            "SQL_DDBB - People v1.1.0", JOptionPane.ERROR_MESSAGE);
-        System.exit(0);
+        dao = new DAOSQL();
     }
-    dao = new DAOSQL();
-}
 
     private void setupJPADatabase() {
         try {
@@ -401,7 +400,7 @@ private void setupSQLDatabase() {
     public void handleUpdateAction() {
         update = new Update(menu, true);
         update.getUpdate().addActionListener(this);
-        
+
         update.getRead().addActionListener(this);
         update.setVisible(true);
         update.setEnabled(false);
@@ -455,33 +454,33 @@ private void setupSQLDatabase() {
     public void handleReadAll() {
         ArrayList<Person> s = readAll();
         if (s.isEmpty()) {
-            JOptionPane.showMessageDialog(menu, "There are not people registered yet.", "Read All - People v1.1.0", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(menu, "There are not people registered yet.",
+                    "Read All - People v1.1.0", JOptionPane.WARNING_MESSAGE);
         } else {
-            readAll = new ReadAll(menu, true);
+            // Create the readAll dialog only if it doesn't exist
+            if (readAll == null) {
+                readAll = new ReadAll(menu, true);
+                // Connect the export button's action listener only once
+                readAll.getExportButton().addActionListener(e -> exportDataToCSV());
+            }
+
+            // Clear the existing table data to avoid duplicates
             DefaultTableModel model = (DefaultTableModel) readAll.getTable().getModel();
+            model.setRowCount(0); // Clear previous rows
+
+            // Populate the table with new data
             for (int i = 0; i < s.size(); i++) {
-                model.addRow(new Object[i]);
+                model.addRow(new Object[5]); // Match the number of columns
                 model.setValueAt(s.get(i).getNif(), i, 0);
                 model.setValueAt(s.get(i).getName(), i, 1);
-                if (s.get(i).getDateOfBirth() != null) {
-                    model.setValueAt(s.get(i).getDateOfBirth().toString(), i, 2);
-                } else {
-                    model.setValueAt("", i, 2);
-                }
+                model.setValueAt(s.get(i).getDateOfBirth() != null ? s.get(i).getDateOfBirth().toString() : "", i, 2);
                 model.setValueAt(s.get(i).getEmail(), i, 3);
-                if (s.get(i).getPhoto() != null) {
-                    model.setValueAt("yes", i, 4);
-                } else {
-                    model.setValueAt("no", i, 4);
-                }
+                model.setValueAt(s.get(i).getPhoto() != null ? "yes" : "no", i, 4);
             }
+
+            // Show the dialog
             readAll.setVisible(true);
         }
-        
-        // Conectar el botón de exportación
-        readAll.getExportButton().addActionListener(e -> exportDataToCSV());
-        
-        readAll.setVisible(true);
     }
 
     public void handleDeleteAll() {
@@ -518,56 +517,56 @@ private void setupSQLDatabase() {
     }
 
     private void handleLoginAction() {
-    if (loginSuccessfully()) {
-        login.dispose();
-        setupMenu(); // Call setupMenu after successful login
-        applyRolePermissions(); // New method to apply permissions based on role
-    } else {
-        JOptionPane.showMessageDialog(login, "Invalid username or password.", "Login - People v1.1.0", JOptionPane.ERROR_MESSAGE);
-        return;
+        if (loginSuccessfully()) {
+            login.dispose();
+            setupMenu(); // Call setupMenu after successful login
+            applyRolePermissions(); // New method to apply permissions based on role
+        } else {
+            JOptionPane.showMessageDialog(login, "Invalid username or password.", "Login - People v1.1.0", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
     }
-}
 
-private boolean loginSuccessfully() {
-    String username = login.getUserName().getText();
-    char[] passwordChars = login.getPassword().getPassword();
-    String password = new String(passwordChars);
+    private boolean loginSuccessfully() {
+        String username = login.getUserName().getText();
+        char[] passwordChars = login.getPassword().getPassword();
+        String password = new String(passwordChars);
 
-    try {
-        Connection conn = DriverManager.getConnection(
-            Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
-            Routes.DB.getDbServerUser(),
-            Routes.DB.getDbServerPassword());
+        try {
+            Connection conn = DriverManager.getConnection(
+                    Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
+                    Routes.DB.getDbServerUser(),
+                    Routes.DB.getDbServerPassword());
 
-        PreparedStatement stmt = conn.prepareStatement(
-            "SELECT user_role FROM " + Routes.DB.getDbServerDB() + ".users " +
-            "WHERE username = ? AND password = ?");
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT user_role FROM " + Routes.DB.getDbServerDB() + ".users "
+                    + "WHERE username = ? AND password = ?");
 
-        stmt.setString(1, username);
-        stmt.setString(2, password); // In a real application, hash the password
+            stmt.setString(1, username);
+            stmt.setString(2, password); // In a real application, hash the password
 
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            this.userRole = rs.getString("user_role"); // Store the user role
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                this.userRole = rs.getString("user_role"); // Store the user role
+                rs.close();
+                stmt.close();
+                conn.close();
+                java.util.Arrays.fill(passwordChars, ' '); // Clear password in memory
+                return true;
+            }
+
             rs.close();
             stmt.close();
             conn.close();
-            java.util.Arrays.fill(passwordChars, ' '); // Clear password in memory
-            return true;
+            java.util.Arrays.fill(passwordChars, ' ');
+            return false;
+        } catch (SQLException ex) {
+            java.util.Arrays.fill(passwordChars, ' ');
+            JOptionPane.showMessageDialog(login, "Error de conexión: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
-
-        rs.close();
-        stmt.close();
-        conn.close();
-        java.util.Arrays.fill(passwordChars, ' ');
-        return false;
-    } catch (SQLException ex) {
-        java.util.Arrays.fill(passwordChars, ' ');
-        JOptionPane.showMessageDialog(login, "Error de conexión: " + ex.getMessage(),
-            "Error", JOptionPane.ERROR_MESSAGE);
-        return false;
     }
-}
 
     /**
      * This function inserts the Person object with the requested NIF, if it
@@ -634,13 +633,13 @@ private boolean loginSuccessfully() {
     public void delete(Person p) {
         try {
             if (dao.read(p) != null) {
-                int respuesta = JOptionPane.showConfirmDialog(null,"¿Deseas continuar?","Confirmación",JOptionPane.YES_NO_OPTION ); 
-               if (respuesta == JOptionPane.YES_OPTION) {
-                   dao.delete(p);
-                   JOptionPane.showMessageDialog(null, "Succesfully Deleted");
-        } else if (respuesta == JOptionPane.NO_OPTION) {
-                   JOptionPane.showMessageDialog(null, "Not Deleted");
-        }
+                int respuesta = JOptionPane.showConfirmDialog(null, "¿Deseas continuar?", "Confirmación", JOptionPane.YES_NO_OPTION);
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    dao.delete(p);
+                    JOptionPane.showMessageDialog(null, "Succesfully Deleted");
+                } else if (respuesta == JOptionPane.NO_OPTION) {
+                    JOptionPane.showMessageDialog(null, "Not Deleted");
+                }
             } else {
                 throw new PersonException(p.getNif() + " is not registered and can not "
                         + "be DELETED");
@@ -751,29 +750,30 @@ private boolean loginSuccessfully() {
         }
         return count;
     }
-private void applyRolePermissions() {
-    if (userRole != null) {
-        if ("employee".equalsIgnoreCase(userRole)) {
-            // Disable actions for employee
-            menu.getInsert().setEnabled(false);
-            menu.getUpdate().setEnabled(false);
-            menu.getDelete().setEnabled(false);
-            menu.getDeleteAll().setEnabled(false);
-            menu.getInsert().setVisible(false);
-            menu.getUpdate().setVisible(false);
-            menu.getDelete().setVisible(false);
-            menu.getDeleteAll().setVisible(false);
-        } else if ("admin".equalsIgnoreCase(userRole)) {
-            // Ensure all actions are enabled for admin (default behavior, but good to be explicit)
-            menu.getInsert().setEnabled(true);
-            menu.getUpdate().setEnabled(true);
-            menu.getDelete().setEnabled(true);
-            menu.getDeleteAll().setEnabled(true);
-            menu.getInsert().setVisible(true);
-            menu.getUpdate().setVisible(true);
-            menu.getDelete().setVisible(true);
-            menu.getDeleteAll().setVisible(true);
+
+    private void applyRolePermissions() {
+        if (userRole != null) {
+            if ("employee".equalsIgnoreCase(userRole)) {
+                // Disable actions for employee
+                menu.getInsert().setEnabled(false);
+                menu.getUpdate().setEnabled(false);
+                menu.getDelete().setEnabled(false);
+                menu.getDeleteAll().setEnabled(false);
+                menu.getInsert().setVisible(false);
+                menu.getUpdate().setVisible(false);
+                menu.getDelete().setVisible(false);
+                menu.getDeleteAll().setVisible(false);
+            } else if ("admin".equalsIgnoreCase(userRole)) {
+                // Ensure all actions are enabled for admin (default behavior, but good to be explicit)
+                menu.getInsert().setEnabled(true);
+                menu.getUpdate().setEnabled(true);
+                menu.getDelete().setEnabled(true);
+                menu.getDeleteAll().setEnabled(true);
+                menu.getInsert().setVisible(true);
+                menu.getUpdate().setVisible(true);
+                menu.getDelete().setVisible(true);
+                menu.getDeleteAll().setVisible(true);
+            }
         }
     }
-}
 }
