@@ -110,6 +110,7 @@ public class DAOJPA implements IDAO {
         if (pC != null) {
             pC.setName(p.getName());
             pC.setDateOfBirth(p.getDateOfBirth());
+            pC.setEmail(p.getEmail());
             if(p.getPhoto() != null)
                 pC.setPhotoOnlyJPA(imageIconToBytes(p.getPhoto()));
             else
