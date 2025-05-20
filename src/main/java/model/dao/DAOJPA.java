@@ -16,6 +16,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.swing.ImageIcon;
+import model.dao.IDAO;
 
 /**
  * This class implements the IDAO interface and completes the function code
@@ -110,7 +111,8 @@ public class DAOJPA implements IDAO {
         if (pC != null) {
             pC.setName(p.getName());
             pC.setDateOfBirth(p.getDateOfBirth());
-            if (p.getPhoto() != null) {
+            pC.setEmail(p.getEmail());
+            if(p.getPhoto() != null){
                 pC.setPhotoOnlyJPA(imageIconToBytes(p.getPhoto()));
             } else {
                 pC.setPhotoOnlyJPA(null);
