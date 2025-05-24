@@ -33,5 +33,10 @@ public class DataValidation {
         String emailRegex = "^[a-zA-Z0-9_+&-]+(?:\\.[a-zA-Z0-9_+&-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return Pattern.compile(emailRegex).matcher(email).matches();
     }
+    
+    public static boolean isValidPhone(String phone) {
+        String phoneRegex = "^\\+?[0-9]{1,4}?[-.\\s]?(\\d{1,3})?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$";
+        return Pattern.compile(phoneRegex).matcher(phone).matches();
+    }
 
 }

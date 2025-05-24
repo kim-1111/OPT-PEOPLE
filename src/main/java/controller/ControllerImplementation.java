@@ -349,6 +349,9 @@ public class ControllerImplementation implements IController, ActionListener {
         if (insert.getEmail().getText() != null) {
             p.setEmail(insert.getEmail().getText().trim());
         }
+        if (insert.getPhone().getText() != null) {
+            p.setPhoneNumber(insert.getPhone().getText().trim());
+        }
         insert(p);
         insert.getReset().doClick();
 
@@ -372,6 +375,7 @@ public class ControllerImplementation implements IController, ActionListener {
                 dateModel.setValue(calendar);
             }
             read.getEmail().setText(pNew.getEmail());
+            read.getPhoneNumber().setText(pNew.getPhoneNumber());
             //To avoid charging former images
             if (pNew.getPhoto() != null) {
                 pNew.getPhoto().getImage().flush();
@@ -400,7 +404,6 @@ public class ControllerImplementation implements IController, ActionListener {
     public void handleUpdateAction() {
         update = new Update(menu, true);
         update.getUpdate().addActionListener(this);
-
         update.getRead().addActionListener(this);
         update.setVisible(true);
         update.setEnabled(false);
@@ -414,9 +417,10 @@ public class ControllerImplementation implements IController, ActionListener {
                 update.getNam().setEnabled(true);
                 update.getDateOfBirth().setEnabled(true);
                 update.getEmail().setEnabled(true);
-                update.getPhoto().setEnabled(true);
+                update.getPhone().setEnabled(true);
                 update.getNam().setText(pNew.getName());
                 update.getEmail().setText(pNew.getEmail());
+                update.getPhone().setText(pNew.getPhoneNumber());
                 if (pNew.getDateOfBirth() != null) {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(pNew.getDateOfBirth());
@@ -442,6 +446,9 @@ public class ControllerImplementation implements IController, ActionListener {
             }
             if ((update.getEmail().getText()) != null) {
                 p.setEmail(update.getEmail().getText());
+            }
+            if ((update.getPhone().getText()) != null) {
+                p.setPhoneNumber(update.getPhone().getText());
             }
             if ((ImageIcon) (update.getPhoto().getIcon()) != null) {
                 p.setPhoto((ImageIcon) update.getPhoto().getIcon());
@@ -470,12 +477,13 @@ public class ControllerImplementation implements IController, ActionListener {
 
             // Populate the table with new data
             for (int i = 0; i < s.size(); i++) {
-                model.addRow(new Object[5]); // Match the number of columns
+                model.addRow(new Object[6]); // Match the number of columns
                 model.setValueAt(s.get(i).getNif(), i, 0);
                 model.setValueAt(s.get(i).getName(), i, 1);
                 model.setValueAt(s.get(i).getDateOfBirth() != null ? s.get(i).getDateOfBirth().toString() : "", i, 2);
                 model.setValueAt(s.get(i).getEmail(), i, 3);
-                model.setValueAt(s.get(i).getPhoto() != null ? "yes" : "no", i, 4);
+                model.setValueAt(s.get(i).getPhoneNumber(), i, 4);
+                model.setValueAt(s.get(i).getPhoto() != null ? "yes" : "no", i, 5);
             }
 
             // Show the dialog

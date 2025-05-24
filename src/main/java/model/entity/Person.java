@@ -25,6 +25,7 @@ public class Person implements Serializable {
     private String name;
     private Date dateOfBirth;
     private String email;
+    private String phoneNumber;
     @Transient
     private ImageIcon photo;
     @Lob
@@ -63,13 +64,15 @@ public class Person implements Serializable {
      * @param nif
      * @param dateOfBirth
      * @param email
+     * @param phoneNumber
      * @param photo
      */
-    public Person(String name, String nif, Date dateOfBirth, String email, ImageIcon photo) {
-        this.name = name;
+    public Person(String name, String nif,  Date dateOfBirth, String email, String phoneNumber, ImageIcon photo) {
         this.nif = nif;
+        this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
+        this.phoneNumber = phoneNumber;
         this.photo = photo;
     }
 
@@ -122,6 +125,14 @@ public class Person implements Serializable {
         this.email = email;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     /**
      * Function used to compare two Personas. There cannot be two or more people
      * with the same ID. Actually it isn't used in this project.
@@ -130,8 +141,8 @@ public class Person implements Serializable {
      */
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + Objects.hashCode(this.nif);
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.nif);
         return hash;
     }
 
@@ -165,7 +176,7 @@ public class Person implements Serializable {
      */
     @Override
     public String toString() {
-        return "Person{" + "nif=" + nif + ", name=" + name + ", dateOfBirth=" + dateOfBirth + ", email=" + email + ", photo=" + photo + '}';
+        return "Person{" + "nif=" + nif + ", name=" + name + ", dateOfBirth=" + dateOfBirth + ", email=" + email + ", phoneNumber=" + phoneNumber + ", photo=" + photo + ", photoOnlyJPA=" + photoOnlyJPA + '}';
     }
 
 }
