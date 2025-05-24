@@ -33,8 +33,8 @@ public class DAOSQL implements IDAO {
 
     private final String SQL_SELECT_ALL = "SELECT * FROM " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + ";";
     private final String SQL_SELECT = "SELECT * FROM " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + " WHERE (nif = ?);";
-    private final String SQL_INSERT = "INSERT INTO " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + " (nif, name, dateOfBirth, email, photo) VALUES (?, ?, ?, ?, ?);";
-    private final String SQL_UPDATE = "UPDATE " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + " SET name = ?, dateOfBirth = ?, email = ?, photo = ? WHERE (nif = ?);";
+    private final String SQL_INSERT = "INSERT INTO " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + " (nif, name, dateOfBirth, email, phoneNumber, photo) VALUES (?, ?, ?, ?, ?, ?);";
+    private final String SQL_UPDATE = "UPDATE " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + " SET name = ?, dateOfBirth = ?, email = ?, phoneNumber= ?, photo = ? WHERE (nif = ?);";
     private final String SQL_DELETE = "DELETE FROM " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE() + " WHERE (nif = ";
     private final String SQL_DELETE_ALL = "TRUNCATE " + Routes.DB.getDbServerDB() + "." + Routes.DB.getDbServerTABLE();
 
@@ -70,6 +70,10 @@ public class DAOSQL implements IDAO {
             if (email != null) {
                 pReturn.setEmail(email);
             }
+            String phoneNumber = rs.getString("phoneNumber");
+            if (phoneNumber != null) {
+                pReturn.setPhoneNumber(phoneNumber);
+            }
             String photo = rs.getString("photo");
             if (photo != null) {
                 pReturn.setPhoto(new ImageIcon(photo));
@@ -95,11 +99,12 @@ public class DAOSQL implements IDAO {
             String name = rs.getString("name");
             Date date = rs.getDate("dateOfBirth");
             String email = rs.getString("email");
+            String phoneNumber = rs.getString("phoneNumber");
             String photo = rs.getString("photo");
             if (photo != null) {
-                people.add(new Person(nif, name, date, email, new ImageIcon(photo)));
+                people.add(new Person(nif, name, date, email, phoneNumber, new ImageIcon(photo)));
             } else {
-                people.add(new Person(nif, name, date, email, null));
+                people.add(new Person(nif, name, date, email, phoneNumber, null));
             }
         }
         rs.close();
@@ -137,6 +142,7 @@ public class DAOSQL implements IDAO {
             instruction.setDate(3, null);
         }
         instruction.setString(4, p.getEmail());
+        instruction.setString(5, p.getPhoneNumber());
         
         if (p.getPhoto() != null) {
             String sep = File.separator;
@@ -157,9 +163,9 @@ public class DAOSQL implements IDAO {
                 outB.write(img[i]);
             }
             outB.close();
-            instruction.setString(5, photo.getPath());
+            instruction.setString(6, photo.getPath());
         } else {
-            instruction.setString(5, null);
+            instruction.setString(6, null);
         }
         instruction.executeUpdate();
         instruction.close();
@@ -179,6 +185,7 @@ public class DAOSQL implements IDAO {
             instruction.setDate(2, null);
         }
         instruction.setString(3, p.getEmail());
+        instruction.setString(4, p.getPhoneNumber());
         if (p.getPhoto() != null) {
             String sep = File.separator;
             File imagePerson = new File(Routes.DB.getFolderPhotos() + sep + p.getNif() + ".png");
@@ -197,14 +204,14 @@ public class DAOSQL implements IDAO {
                 outB.write(img[i]);
             }
             outB.close();
-            instruction.setString(4, imagePerson.getPath());
+            instruction.setString(5, imagePerson.getPath());
         } else {
-            instruction.setString(4, null);
+            instruction.setString(5, null);
             File photoFile = new File(Routes.DB.getFolderPhotos() + File.separator + p.getNif()
                     + ".png");
             photoFile.delete();
         }
-        instruction.setString(5, p.getNif());
+        instruction.setString(6, p.getNif());
         instruction.executeUpdate();
         instruction.close();
         disconnect(conn);
