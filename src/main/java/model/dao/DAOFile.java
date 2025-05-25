@@ -52,10 +52,10 @@ public class DAOFile implements IDAO {
                     date = dateFormat.parse(data[2]);
                 }
                 ImageIcon photo = null;
-                if (!data[5].equals("null")) {
-                    photo = new ImageIcon(data[5]);
+                if (!data[6].equals("null")) {
+                    photo = new ImageIcon(data[6]);
                 }
-                personToRead = new Person(data[0], data[1], date, data[3], data[4], photo);
+                personToRead = new Person(data[0], data[1], date, data[3], data[4], data[5], photo);
                 break;
             }
             line = br.readLine();
@@ -81,10 +81,10 @@ public class DAOFile implements IDAO {
                 date = dateFormat.parse(data[2]);
             }
             ImageIcon photo = null;
-            if (!data[5].equals("null")) {
-                photo = new ImageIcon(data[5]);
+            if (!data[6].equals("null")) {
+                photo = new ImageIcon(data[6]);
             }
-            people.add(new Person(data[0], data[1], date, data[3], data[4], photo));
+            people.add(new Person(data[0], data[1], date, data[3], data[4], data[5], photo));
             line = br.readLine();
         }
         br.close();
@@ -101,9 +101,9 @@ public class DAOFile implements IDAO {
         if (p.getDateOfBirth() != null) {
             DateFormat dateFormat = new SimpleDateFormat("yyy/MM/dd");
             String dateAsString = dateFormat.format(p.getDateOfBirth());
-            bw.write(p.getName() + "\t" + p.getNif() + "\t" + dateAsString + "\t" + p.getEmail() + "\t" + p.getPhoneNumber() + "\t");
+            bw.write(p.getName() + "\t" + p.getNif() + "\t" + dateAsString + "\t" + p.getEmail() + "\t" + p.getPhoneNumber() + "\t" + p.getPostal()+ "\t");
         } else {
-            bw.write(p.getName() + "\t" + p.getNif() + "\t" + "null" + "\t" + p.getEmail() + "\t" + p.getPhoneNumber() + "\t");
+            bw.write(p.getName() + "\t" + p.getNif() + "\t" + "null" + "\t" + p.getEmail() + "\t" + p.getPhoneNumber() + "\t" + p.getPostal()+ "\t");
         }
         if (p.getPhoto() != null) {
             FileOutputStream out;
@@ -143,14 +143,14 @@ public class DAOFile implements IDAO {
             String l = rafRW.readLine();
             String d[] = l.split("\t");
             if (p.getNif().equals(d[1])) {
-                if (!d[5].equals("null")) {
+                if (!d[6].equals("null")) {
                     File photoFile = new File(Routes.FILE.getFolderPhotos() + sep + p.getNif()
                             + ".png");
                     photoFile.delete();
                 }
             } else {
                 textoNuevo += d[0] + "\t" + d[1] + "\t" + d[2] + "\t" + d[3]
-                        + "\t" + d[4] + "\t" + d[5] + "\t";
+                        + "\t" + d[4] + "\t" + d[5] + "\t" + d[6] + "\t";
             }
         }
         rafRW.setLength(0);
