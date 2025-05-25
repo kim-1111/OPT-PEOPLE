@@ -37,15 +37,17 @@ public class Insert extends javax.swing.JDialog {
         addPlaceholderStyle(name);
         addPlaceholderStyle(email);
         addPlaceholderStyle(phone);
+        addPlaceholderStyle(postal);
         DropPhotoListener d = new DropPhotoListener(photo, this);
         DropTarget dropTarget = new DropTarget(photo, d);
         insert.setEnabled(false);
 
         insert.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JOptionPane.showMessageDialog(Insert.this, "Person inserted successfully!", "Insert", JOptionPane.INFORMATION_MESSAGE);
                 jCheckBox1.setSelected(false);
                 email.setEditable(true);
+                phone.setEditable(true);
+                postal.setEditable(true);
             }
         });
 
@@ -88,6 +90,10 @@ public class Insert extends javax.swing.JDialog {
         return phone;
     }
 
+    public JTextField getPostal() {
+        return postal;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -113,6 +119,8 @@ public class Insert extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         phone = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        postal = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Insert - People v1.1.0");
@@ -308,6 +316,33 @@ public class Insert extends javax.swing.JDialog {
             }
         });
 
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel11.setText("<html><p>Postal Code<i style=\"color:red\"> *</i></p></html>");
+        jLabel11.setMaximumSize(new java.awt.Dimension(150, 22));
+        jLabel11.setMinimumSize(new java.awt.Dimension(150, 22));
+        jLabel11.setPreferredSize(new java.awt.Dimension(150, 22));
+
+        postal.setText("Enter a valid postal code");
+        postal.setMaximumSize(new java.awt.Dimension(400, 22));
+        postal.setMinimumSize(new java.awt.Dimension(400, 22));
+        postal.setPreferredSize(new java.awt.Dimension(400, 22));
+        postal.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                postalFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                postalFocusLost(evt);
+            }
+        });
+        postal.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                postalKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                postalKeyTyped(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -326,13 +361,15 @@ public class Insert extends javax.swing.JDialog {
                                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(24, 24, 24)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(nif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(dateOfBirth, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(phone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(phone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(postal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(348, 348, 348)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -372,7 +409,11 @@ public class Insert extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(phone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(postal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addComponent(jCheckBox1)
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -392,7 +433,7 @@ public class Insert extends javax.swing.JDialog {
     private void showInsert() {
         boolean enableInsert = false;
         if (!name.getText().isEmpty() && !nif.isEditable()) {
-            if (!DataValidation.isValidEmail(email.getText().trim()) && !DataValidation.isValidPhone(phone.getText().trim())) {
+            if (!DataValidation.isValidEmail(email.getText().trim()) && !DataValidation.isValidPhone(phone.getText().trim()) && !DataValidation.isValidPostal(postal.getText().trim())) {
                 enableInsert = false;
             } else {
                 enableInsert = true;
@@ -422,6 +463,7 @@ public class Insert extends javax.swing.JDialog {
         name.setText("Enter full name");
         email.setText("Enter a valid email address");
         phone.setText("Enter a valid number");
+        postal.setText("Enter a valid postal code");
         photo.setIcon(null);
         //We reset the calendar date to the current date ...
         LocalDate dateLocate = LocalDate.now();
@@ -440,6 +482,7 @@ public class Insert extends javax.swing.JDialog {
         addPlaceholderStyle(name);
         addPlaceholderStyle(email);
         addPlaceholderStyle(phone);
+        addPlaceholderStyle(postal);
 
     }//GEN-LAST:event_resetActionPerformed
 
@@ -554,6 +597,7 @@ public class Insert extends javax.swing.JDialog {
         if (jCheckBox1.isSelected()) {
             String emailText = email.getText().trim();
             String phoneNumber = phone.getText().trim();
+            String postalCode = postal.getText().trim();
             if (!DataValidation.isValidEmail(emailText)) {
                 JOptionPane.showMessageDialog(this,
                         "Cannot verify: Invalid email format",
@@ -568,10 +612,18 @@ public class Insert extends javax.swing.JDialog {
                         JOptionPane.ERROR_MESSAGE);
                 jCheckBox1.setSelected(false);
                 phone.setEditable(true);
+            } else if (!DataValidation.isValidPostal(postalCode)) {
+                JOptionPane.showMessageDialog(this,
+                        "Cannot verify: Invalid postal code format",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                jCheckBox1.setSelected(false);
+                postal.setEditable(true);
             } else {
                 showInsert();
                 email.setEditable(false);
                 phone.setEditable(false);
+                postal.setEditable(false);
             }
         }
     }//GEN-LAST:event_jCheckBox1ActionPerformed
@@ -599,6 +651,29 @@ public class Insert extends javax.swing.JDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_phoneKeyTyped
 
+    private void postalFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_postalFocusGained
+        if (postal.getText().equals("Enter a valid postal code")) {
+            postal.setText(null);
+            postal.requestFocus();
+            removePlaceholderStyle(postal);
+        }
+    }//GEN-LAST:event_postalFocusGained
+
+    private void postalFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_postalFocusLost
+        if (postal.getText().length() == 0) {
+            addPlaceholderStyle(postal);
+            postal.setText("Enter a valid postal code");
+        }
+    }//GEN-LAST:event_postalFocusLost
+
+    private void postalKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_postalKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_postalKeyReleased
+
+    private void postalKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_postalKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_postalKeyTyped
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdatepicker.JDatePicker dateOfBirth;
@@ -607,6 +682,7 @@ public class Insert extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
@@ -616,6 +692,7 @@ public class Insert extends javax.swing.JDialog {
     private javax.swing.JTextField nif;
     private javax.swing.JTextField phone;
     private javax.swing.JLabel photo;
+    private javax.swing.JTextField postal;
     private javax.swing.JButton reset;
     // End of variables declaration//GEN-END:variables
 }

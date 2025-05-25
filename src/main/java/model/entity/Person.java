@@ -26,6 +26,7 @@ public class Person implements Serializable {
     private Date dateOfBirth;
     private String email;
     private String phoneNumber;
+    private String postal;
     @Transient
     private ImageIcon photo;
     @Lob
@@ -65,14 +66,16 @@ public class Person implements Serializable {
      * @param dateOfBirth
      * @param email
      * @param phoneNumber
+     * @param postal
      * @param photo
      */
-    public Person(String name, String nif,  Date dateOfBirth, String email, String phoneNumber, ImageIcon photo) {
+    public Person(String name, String nif, Date dateOfBirth, String email, String phoneNumber, String postal, ImageIcon photo) {
         this.nif = nif;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.postal = postal;
         this.photo = photo;
     }
 
@@ -133,6 +136,14 @@ public class Person implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getPostal() {
+        return postal;
+    }
+
+    public void setPostal(String postal) {
+        this.postal = postal;
+    }
+
     /**
      * Function used to compare two Personas. There cannot be two or more people
      * with the same ID. Actually it isn't used in this project.
@@ -141,8 +152,8 @@ public class Person implements Serializable {
      */
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.nif);
+        int hash = 3;
+        hash = 79 * hash + Objects.hashCode(this.nif);
         return hash;
     }
 
@@ -176,7 +187,7 @@ public class Person implements Serializable {
      */
     @Override
     public String toString() {
-        return "Person{" + "nif=" + nif + ", name=" + name + ", dateOfBirth=" + dateOfBirth + ", email=" + email + ", phoneNumber=" + phoneNumber + ", photo=" + photo + ", photoOnlyJPA=" + photoOnlyJPA + '}';
+        return "Person{" + "nif=" + nif + ", name=" + name + ", dateOfBirth=" + dateOfBirth + ", email=" + email + ", phoneNumber=" + phoneNumber + ", postal=" + postal + ", photo=" + photo + ", photoOnlyJPA=" + photoOnlyJPA + '}';
     }
 
 }

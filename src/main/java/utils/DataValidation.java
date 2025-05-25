@@ -38,5 +38,9 @@ public class DataValidation {
         String phoneRegex = "^\\+?[0-9]{1,4}?[-.\\s]?(\\d{1,3})?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$";
         return Pattern.compile(phoneRegex).matcher(phone).matches();
     }
-
+    
+    public static boolean isValidPostal(String postal) {
+        String postalRegex = "^(\\d{5})(?:[-\\s]?\\d{4})?$";
+        return Pattern.compile(postalRegex).matcher(postal).matches();
+    }
 }
