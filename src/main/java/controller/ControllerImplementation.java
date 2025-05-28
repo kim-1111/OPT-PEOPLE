@@ -226,6 +226,7 @@ public class ControllerImplementation implements IController, ActionListener {
                 setupJPADatabase();
                 break;
         }
+        setupUsers();
         handleLogin();
     }
 
@@ -280,6 +281,29 @@ public class ControllerImplementation implements IController, ActionListener {
                         + "name VARCHAR(50), "
                         + "dateOfBirth DATE, "
                         + "photo VARCHAR(200));");
+                stmt.close();
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(dSS, "SQL-DDBB structure not created. Closing application.",
+                    "SQL_DDBB - People v1.1.0", JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
+        dao = new DAOSQL();
+    }
+
+    private void setupUsers() {
+        try {
+            Connection conn = DriverManager.getConnection(
+                    Routes.DB.getDbServerAddress() + Routes.DB.getDbServerComOpt(),
+                    Routes.DB.getDbServerUser(),
+                    Routes.DB.getDbServerPassword());
+
+            if (conn != null) {
+                Statement stmt = conn.createStatement();
+
+                // Crear base de datos si no existe
+                stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ";");
 
                 // Crear tabla para usuarios y roles
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + Routes.DB.getDbServerDB() + ".users ("
@@ -293,18 +317,16 @@ public class ControllerImplementation implements IController, ActionListener {
                             + "('admin', 'admin123', 'admin'), "
                             + "('employee1', 'emp123', 'employee');");
                 } catch (SQLException e) {
-                    System.out.println("Admin user already exists or error inserting: " + e.getMessage());
                 }
 
                 stmt.close();
                 conn.close();
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(dSS, "SQL-DDBB structure not created. Closing application.",
+            JOptionPane.showMessageDialog(dSS, "SQL-DDBB structure not created, unable to get valid user. Closing application.",
                     "SQL_DDBB - People v1.1.0", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
-        dao = new DAOSQL();
     }
 
     private void setupJPADatabase() {
